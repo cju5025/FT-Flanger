@@ -1,15 +1,22 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Parameters.h"
 
-//==============================================================================
+AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
+{
+    std::vector<std::unique_ptr<AudioParameterFloat>> params;
+    
+    for (int i = 0; i < kFTFlangerParameter_TotalNumParameters; i++)
+    {
+        params.push_back(std::make_unique<AudioParameterFloat>(FTFlangerParameterID[i],
+                                                               FTFlangerParameterLabel[i],
+                                                               NormalisableRange<float> (0.0f, 1.0f, 0.001f),
+                                                               FTFlangerParameterDefaultValue[i]));
+    }
+    return { params.begin(), params.end() };
+}
+
+
 FTFlangerAudioProcessor::FTFlangerAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -19,9 +26,14 @@ FTFlangerAudioProcessor::FTFlangerAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+                       parameters(*this,
+                                    nullptr,
+                                    Identifier("FTFlanger"),
+                                    createParameterLayout())
 #endif
 {
+    initializeDSP();
 }
 
 FTFlangerAudioProcessor::~FTFlangerAudioProcessor()
@@ -93,14 +105,23 @@ void FTFlangerAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void FTFlangerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    for (int i = 0; i < getTotalNumInputChannels(); i++)
+    {
+        mFlanger[i]->setSampleRate(sampleRate);
+        mLFO[i]->setSampleRate(sampleRate);
+    }
+    
+    mDryWetSmoothed.reset(sampleRate, 0.004f);
+    mFeedbackSmoothed.reset(sampleRate, 0.004f);
 }
 
 void FTFlangerAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    for (int i = 0; i < getTotalNumInputChannels(); i++)
+    {
+        mFlanger[i]->reset();
+        mLFO[i]->reset();
+    }
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -135,26 +156,34 @@ void FTFlangerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+        
+        float rate = -(*parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_ModulationRate]));
+        
+        if (channel > 0)
+        {
+            rate = *parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_ModulationRate]);
+        }
+        
+        mLFO[channel]->process(rate,
+                               *parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_ModulationDepth]),
+                               buffer.getNumSamples());
+        
+        mDryWetSmoothed.setTargetValue(*parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_WetDry]));
+        mFeedbackSmoothed.setTargetValue(*parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_Feedback]));
+        
+        mFlanger[channel]->process(channelData,
+                                 mFeedbackSmoothed.getNextValue(),
+                                 mDryWetSmoothed.getNextValue(),
+                                 mLFO[channel]->getBuffer(),
+                                 channelData,
+                                 buffer.getNumSamples());
+        
     }
 }
 
@@ -172,15 +201,27 @@ juce::AudioProcessorEditor* FTFlangerAudioProcessor::createEditor()
 //==============================================================================
 void FTFlangerAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+   auto state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void FTFlangerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (parameters.state.getType()))
+            parameters.replaceState (juce::ValueTree::fromXml (*xmlState));
+}
+
+void FTFlangerAudioProcessor::initializeDSP()
+{
+    for (int i = 0; i < getTotalNumInputChannels(); i++)
+    {
+        mFlanger[i] = std::make_unique<FTFlangerFlanger>();
+        mLFO[i] = std::make_unique<FTFlangerLFO>();
+    }
 }
 
 //==============================================================================

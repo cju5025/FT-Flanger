@@ -1,18 +1,10 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
+#include "Flanger.h"
+#include "LFO.h"
 
-//==============================================================================
-/**
-*/
+
 class FTFlangerAudioProcessor  : public juce::AudioProcessor
 {
 public:
@@ -52,8 +44,19 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    AudioProcessorValueTreeState parameters;
 
 private:
+
+    void initializeDSP();
+    
+    std::unique_ptr<FTFlangerLFO> mLFO[8];
+    std::unique_ptr<FTFlangerFlanger> mFlanger[8];
+    
+    SmoothedValue<float, ValueSmoothingTypes::Linear> mFeedbackSmoothed { 0.0f };
+    SmoothedValue<float, ValueSmoothingTypes::Linear> mDryWetSmoothed { 0.0f };
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FTFlangerAudioProcessor)
 };
