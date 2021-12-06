@@ -30,7 +30,7 @@ public:
         g.setColour(Colours::black);
         g.fillEllipse(dialArea);
         
-        g.setColour(Colour(1, 124, 168));
+        g.setColour(Colour(255, 218, 5));
         g.setFont(font_2);
         
         Path dialTick;
