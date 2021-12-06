@@ -31,7 +31,7 @@ void FTFlangerLFO::process(float inRate, float inDepth, int inNumSamples)
 {
     getHostBPM();
     
-    const float rate = jmap(inRate, 0.0f, 1.0f, 0.01f, 10.0f);
+    const float rate = jmap(inRate, 0.0f, 1.0f, 0.001f, 50.0f);
     
     for (int i = 0; i < inNumSamples; i++)
     {
