@@ -28,6 +28,7 @@ private:
     double mFeedbackSample;
     
     float mTimeSmoothed;
+    float mLFOPhase;
     
     int mDelayIndex;
 };

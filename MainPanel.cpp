@@ -27,7 +27,7 @@ void FTFlangerMainPanel::paint(Graphics& g)
     }
     
     const int sliderSize = 75;
-    int x = (getWidth() / 2) - (sliderSize * 1.5);
+    int x = (getWidth() / 2) - (sliderSize * 2.5);
     int y = (getHeight()) - (sliderSize * 1.25);
     
     FTFlangerParameterSlider* feedback =
@@ -42,7 +42,7 @@ void FTFlangerMainPanel::paint(Graphics& g)
     wetdry->setBounds(x, y, sliderSize, sliderSize);
     addAndMakeVisible(wetdry);
     mFXSliders.add(wetdry);
-    x = (getWidth() / 2) - (sliderSize * 1.5);
+    x = (getWidth() / 2) - (sliderSize * 2.5);
     y = (getHeight() * 0.75) - (sliderSize * 1.75);
     
     FTFlangerParameterSlider* rate =
@@ -57,6 +57,13 @@ void FTFlangerMainPanel::paint(Graphics& g)
     depth->setBounds(x, y, sliderSize, sliderSize);
     addAndMakeVisible(depth);
     mFXSliders.add(depth);
+    x += sliderSize * 2;
+    
+    FTFlangerParameterSlider* phaseOffset =
+    new FTFlangerParameterSlider(mProcessor->parameters, FTFlangerParameterID[kFTFlangerParameter_PhaseOffset]);
+    phaseOffset->setBounds(x, y, sliderSize, sliderSize);
+    addAndMakeVisible(phaseOffset);
+    mFXSliders.add(phaseOffset);
 
                 
 }
