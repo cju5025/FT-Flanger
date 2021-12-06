@@ -4,8 +4,8 @@ FTFlangerFlanger::FTFlangerFlanger()
 :   mSampleRate(-1),
     mFeedbackSample(0.0f),
     mTimeSmoothed(0.0f),
-    mDelayIndex(0),
-    mLFOPhase(0)
+    mLFOPhase(0),
+    mDelayIndex(0)
 {
     
 }
