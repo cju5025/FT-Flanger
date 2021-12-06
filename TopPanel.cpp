@@ -18,5 +18,5 @@ void FTFlangerTopPanel::paint(Graphics& g)
     
     g.setColour(Colour(1, 124, 168));
     g.setFont(font_1);
-    g.drawFittedText("FT Chorus", 0, 0, getWidth() - 10, getHeight(), Justification::centred, 1);
+    g.drawFittedText("FT Flanger", 0, 0, getWidth() - 10, getHeight(), Justification::centred, 1);
 }
