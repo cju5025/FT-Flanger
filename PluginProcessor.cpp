@@ -163,7 +163,9 @@ void FTFlangerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     {
         auto* channelData = buffer.getWritePointer (channel);
         
-        float rate = -(*parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_ModulationRate]));
+        //TODO: phase offset on/off box, phase offset invert toggle
+        
+        float rate = *parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_ModulationRate]) + *parameters.getRawParameterValue(FTFlangerParameterID[kFTFlangerParameter_PhaseOffset]);
         
         if (channel > 0)
         {
