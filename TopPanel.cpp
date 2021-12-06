@@ -16,7 +16,7 @@ void FTFlangerTopPanel::paint(Graphics& g)
 {    
     FTFlangerPanelBase::paint(g);
     
-    g.setColour(Colour(1, 124, 168));
+    g.setColour(Colour(255, 218, 5));
     g.setFont(font_1);
     g.drawFittedText("FT Flanger", 0, 0, getWidth() - 10, getHeight(), Justification::centred, 1);
 }
