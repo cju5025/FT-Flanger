@@ -6,7 +6,7 @@ enum FTFlangerParameter
     kFTFlangerParameter_WetDry,
     kFTFlangerParameter_ModulationRate,
     kFTFlangerParameter_ModulationDepth,
-    kFTFlangerParameter_PhaseOffset,
+    kFTFlangerParameter_RateOffset,
     kFTFlangerParameter_TotalNumParameters
 };
 
@@ -16,7 +16,7 @@ static String FTFlangerParameterID [ kFTFlangerParameter_TotalNumParameters ] =
     "Wet / Dry",
     "Modulation Rate",
     "Modulation Depth",
-    "Phase Offset"
+    "Rate Offset"
 };
 
 static String FTFlangerParameterLabel [ kFTFlangerParameter_TotalNumParameters ] =
@@ -25,7 +25,7 @@ static String FTFlangerParameterLabel [ kFTFlangerParameter_TotalNumParameters ]
     "Wet/Dry",
     "Modulation Rate",
     "Modulation Depth",
-    "Phase Offset"
+    "Rate Offset"
 };
 
 static float FTFlangerParameterDefaultValue [ kFTFlangerParameter_TotalNumParameters ] =
@@ -34,5 +34,5 @@ static float FTFlangerParameterDefaultValue [ kFTFlangerParameter_TotalNumParame
     0.5f,
     0.25f,
     0.5f,
-    0.5f
+    0.0f
 };
