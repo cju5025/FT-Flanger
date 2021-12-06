@@ -164,6 +164,7 @@ void FTFlangerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         auto* channelData = buffer.getWritePointer (channel);
         
         //TODO: phase offset on/off box, phase offset invert toggle
+        //TODO: independent channel rate params instead of just rate offset?
         
         // hold on now this is wrong, phase offset should be added to the phase of a channel, not the rate
         // okay we will change to rate offset because thats actually cool, but still want phase offset
