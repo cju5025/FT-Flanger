@@ -59,11 +59,11 @@ void FTFlangerMainPanel::paint(Graphics& g)
     mFXSliders.add(depth);
     x += sliderSize * 2;
     
-    FTFlangerParameterSlider* phaseOffset =
-    new FTFlangerParameterSlider(mProcessor->parameters, FTFlangerParameterID[kFTFlangerParameter_PhaseOffset]);
-    phaseOffset->setBounds(x, y, sliderSize, sliderSize);
-    addAndMakeVisible(phaseOffset);
-    mFXSliders.add(phaseOffset);
+    FTFlangerParameterSlider* rateOffset =
+    new FTFlangerParameterSlider(mProcessor->parameters, FTFlangerParameterID[kFTFlangerParameter_RateOffset]);
+    rateOffset->setBounds(x, y, sliderSize, sliderSize);
+    addAndMakeVisible(rateOffset);
+    mFXSliders.add(rateOffset);
 
                 
 }
