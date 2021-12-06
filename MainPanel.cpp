@@ -37,11 +37,18 @@ void FTFlangerMainPanel::paint(Graphics& g)
     mFXSliders.add(feedback);
     x += sliderSize * 2;
     
-    FTFlangerParameterSlider* wetdry =
+    FTFlangerParameterSlider* wetDry =
     new FTFlangerParameterSlider(mProcessor->parameters, FTFlangerParameterID[kFTFlangerParameter_WetDry]);
-    wetdry->setBounds(x, y, sliderSize, sliderSize);
-    addAndMakeVisible(wetdry);
-    mFXSliders.add(wetdry);
+    wetDry->setBounds(x, y, sliderSize, sliderSize);
+    addAndMakeVisible(wetDry);
+    mFXSliders.add(wetDry);
+    x += sliderSize * 2;
+    
+    FTFlangerParameterSlider* phaseOffset =
+    new FTFlangerParameterSlider(mProcessor->parameters, FTFlangerParameterID[kFTFlangerParameter_PhaseOffset]);
+    phaseOffset->setBounds(x, y, sliderSize, sliderSize);
+    addAndMakeVisible(phaseOffset);
+    mFXSliders.add(phaseOffset);
     x = (getWidth() / 2) - (sliderSize * 2.5);
     y = (getHeight() * 0.75) - (sliderSize * 1.75);
     
